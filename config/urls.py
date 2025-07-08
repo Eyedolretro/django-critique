@@ -16,7 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.http import HttpResponse
+from reviews.views import home  # ⬅️ importer la vue
+
+def test_view(request):
+    return HttpResponse("Test OK")
+
+print(">>> config/urls.py loaded <<<")
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('test/', test_view),
+     path('', home, name='home'),  # ⬅️ vue pour la racine du site
 ]
+
+
+
+
+
