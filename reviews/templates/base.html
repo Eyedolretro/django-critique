@@ -1,0 +1,27 @@
+<!-- reviews/templates/base.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}CritiqueHub{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+</head>
+<body>
+    <header>
+        <h1><a href="/">CritiqueHub</a></h1>
+        <nav>
+            <a href="/">Accueil</a>
+            <a href="/admin/">Admin</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 - CritiqueHub</p>
+    </footer>
+</body>
+</html>

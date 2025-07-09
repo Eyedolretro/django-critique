@@ -1,13 +1,22 @@
-<!-- reviews/templates/reviews/home.html -->
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>CritiqueHub - Accueil</title>
-</head>
-<body>
-    <h1>Bienvenue sur <strong>CritiqueHub</strong> 📚</h1>
-    <p>Ceci est la page d'accueil personnalisée avec Django et un template HTML.</p>
-    <a href="/admin/">Accéder à l'administration</a>
-</body>
-</html>
+<h1>Bienvenue sur CritiqueHub</h1>
+
+<nav>
+  <a href="{% url 'home' %}">Accueil</a> |
+  <a href="{% url 'admin:index' %}">Admin</a> |
+  <a href="{% url 'login' %}">Connexion</a> |
+  <a href="{% url 'signup' %}">S'inscrire</a>
+</nav>
+
+<form method="post" action="{% url 'login' %}">
+  {% csrf_token %}
+  <label for="username">Username:</label>
+  <input id="username" type="text" name="username" required>
+  
+  <label for="password">Password:</label>
+  <input id="password" type="password" name="password" required>
+  
+  <button type="submit">Se connecter</button>
+</form>
+
+
+
