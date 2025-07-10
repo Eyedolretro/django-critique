@@ -13,9 +13,16 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render
 from .models import Ticket
 
+
+@login_required
 def home(request):
-    tickets = Ticket.objects.all()
+    tickets = Ticket.objects.filter(user=request.user)
     return render(request, 'reviews/home.html', {'tickets': tickets})
+
+
+
+
+
 
 
 

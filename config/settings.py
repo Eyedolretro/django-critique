@@ -61,7 +61,7 @@ print("ROOT_URLCONF:", ROOT_URLCONF)
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],  # ✅ Cette ligne est maintenant au bon endroit
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,8 +130,11 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'  # ou l’URL que tu souhaites après login
+LOGOUT_REDIRECT_URL = '/login/'  # pour rediriger après logout
+
 
 # Et dans TEMPLATES > DIRS, ton dossier templates racine si besoin, exemple :
 # 'DIRS': [BASE_DIR / 'templates'],

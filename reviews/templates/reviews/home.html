@@ -1,26 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Bienvenue sur CritiqueHub</h1>
+  <h2>Mes tickets</h2>
+  <p>Bonjour {{ request.user.username }} | <a href="{% url 'logout' %}">Déconnexion</a></p>
+  <a href="{% url 'create_ticket' %}">Créer un nouveau ticket</a>
 
-  <div style="margin-bottom: 2em;">
-    <h2>Inscrivez-vous maintenant</h2>
-    <a href="{% url 'signup' %}" class="button">S'inscrire</a>
-  </div>
-
-  <div>
-    <h2>Connectez-vous</h2>
-    <form method="post" action="{% url 'login' %}">
-      {% csrf_token %}
-      <div>
-        <label for="username">Nom d'utilisateur :</label>
-        <input type="text" name="username" id="username" required>
-      </div>
-      <div>
-        <label for="password">Mot de passe :</label>
-        <input type="password" name="password" id="password" required>
-      </div>
-      <button type="submit">Se connecter</button>
-    </form>
-  </div>
+  <ul>
+    {% for ticket in tickets %}
+      <li>{{ ticket.title }} - {{ ticket.created_at }}</li>
+    {% empty %}
+      <li>Aucun ticket pour l'instant.</li>
+    {% endfor %}
+  </ul>
 {% endblock %}

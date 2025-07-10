@@ -12,7 +12,11 @@ urlpatterns = [
     path('ticket/create/', views.create_ticket, name='create_ticket'),
     path('admin/', admin.site.urls),
     path('', include('critiquehub.urls')),
+    path('admin/', admin.site.urls),
+    path('', include('reviews.urls')),  # Assurez-vous que les URLs de l'app sont bien incluses
+    path('accounts/', include('django.contrib.auth.urls')),  # <-- IMPORTANT !
 ]
+
 
 
 
