@@ -10,10 +10,17 @@ from .forms import TicketForm, ReviewForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib.auth import login, authenticate
+from django.shortcuts import render
+from .models import Ticket
 
 def home(request):
     tickets = Ticket.objects.all()
     return render(request, 'reviews/home.html', {'tickets': tickets})
+
+
+
+
+
 
 
 
@@ -61,11 +68,16 @@ def create_ticket(request):
         form = TicketForm(request.POST)
         if form.is_valid():
             ticket = form.save(commit=False)
-            ticket.user = request.user
+            ticket.user = request.user  # associer l'user connecté
             ticket.save()
-            return redirect('home')  # ou vers la création de critique
+            return redirect('home')  # ou vers la page souhaitée après création
     else:
         form = TicketForm()
     return render(request, 'reviews/create_ticket.html', {'form': form})
 
+
+
+
+
+    
 

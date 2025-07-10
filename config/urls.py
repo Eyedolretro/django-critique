@@ -1,10 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
+from reviews import views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/', auth_views.LoginView.as_view(template_name='reviews/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
-    path('', include('reviews.urls')),  # tes vues à toi (dont 'home')
+    path('login/', auth_views.LoginView.as_view(template_name='reviews/home.html'), name='login'),
+    path('signup/', views.signup, name='signup'),
+    path('', include('reviews.urls')),
 ]
