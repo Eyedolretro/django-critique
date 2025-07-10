@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil - CritiqueHub{% endblock %}
+
+{% block content %}
+  <h2>Bienvenue sur CritiqueHub</h2>
+
+  {% if user.is_authenticated %}
+    <p>Bonjour, {{ user.username }} !</p>
+    <a href="{% url 'create_ticket' %}">Créer un ticket</a> |
+    <a href="{% url 'logout' %}">Se déconnecter</a>
+  {% else %}
+    <a href="{% url 'login' %}">Connexion</a> |
+    <a href="{% url 'signup' %}">S'inscrire</a>
+  {% endif %}
+{% endblock %}

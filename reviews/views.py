@@ -6,10 +6,16 @@ from .models import Review, Ticket
 from .forms import ReviewForm
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
+from .forms import TicketForm, ReviewForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
 
 def home(request):
     tickets = Ticket.objects.all()
     return render(request, 'reviews/home.html', {'tickets': tickets})
+
+
 
 class CreateReviewView(CreateView):
     model = Review
@@ -26,13 +32,40 @@ class CreateReviewView(CreateView):
 
 
 
+
+
+
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')  # Redirige vers la page de connexion après inscription
+            user = form.save()
+            login(request, user)
+            return redirect('home')
     else:
         form = UserCreationForm()
     return render(request, 'reviews/signup.html', {'form': form})
+
+
+ 
+
+
+
+
+
+
+
+@login_required
+def create_ticket(request):
+    if request.method == "POST":
+        form = TicketForm(request.POST)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.user = request.user
+            ticket.save()
+            return redirect('home')  # ou vers la création de critique
+    else:
+        form = TicketForm()
+    return render(request, 'reviews/create_ticket.html', {'form': form})
+
 

@@ -131,7 +131,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/login/'
+LOGOUT_REDIRECT_URL = '/'
 
 # Et dans TEMPLATES > DIRS, ton dossier templates racine si besoin, exemple :
 # 'DIRS': [BASE_DIR / 'templates'],
@@ -139,3 +139,6 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
