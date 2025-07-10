@@ -7,3 +7,7 @@ urlpatterns = [
     path('review/<int:ticket_pk>/create/', views.CreateReviewView.as_view(), name='create_review'),
     path('ticket/create/', views.create_ticket, name='create_ticket'),
 ]
+
+
+
+
