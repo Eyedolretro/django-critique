@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Mes tickets</h2>
+  
+  <h2>Mes tickets</h2><a href="{% url 'search_user' %}">🔍 Rechercher un utilisateur</a>
   <p>Bonjour {{ request.user.username }} | <a href="{% url 'logout' %}">Déconnexion</a></p>
-  <a href="{% url 'create_ticket' %}">Créer un nouveau ticket</a>
+  <a href="{% url 'create_ticket' %}">Créer un nouveau ticket</a> 
 
   <ul>
+   
+
     {% for ticket in tickets %}
       <li>{{ ticket.title }} - {{ ticket.created_at }}</li>
     {% empty %}

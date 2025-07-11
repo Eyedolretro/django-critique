@@ -12,6 +12,9 @@ from django.contrib.auth import login
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render
 from .models import Ticket
+from django.contrib.auth.models import User
+from .models import Ticket
+from django.db.models import Q
 
 
 @login_required
@@ -82,6 +85,40 @@ def create_ticket(request):
         form = TicketForm()
     return render(request, 'reviews/create_ticket.html', {'form': form})
 
+
+
+
+
+
+
+def search_user(request):
+    query = request.GET.get('query', '')
+    results = []
+
+    if query:
+        results = Ticket.objects.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(user__username__icontains=query)
+        )
+
+    return render(request, 'reviews/search_user.html', {'results': results, 'query': query})
+
+
+
+
+def search_user_by_ticket(request):
+    query = request.GET.get('query', '')
+    results = []
+
+    if query:
+        results = Ticket.objects.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(user__username__icontains=query)
+        )
+
+    return render(request, 'reviews/search_user.html', {'results': results, 'query': query})
 
 
 

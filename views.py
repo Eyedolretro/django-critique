@@ -19,12 +19,14 @@ def signup(request):
             return redirect('home')
     else:
         form = UserCreationForm()
-    return render(request, 'myapp/signup.html', {'form': form})
+    return render(request, 'reviews/signup.html', {'form': form})
+
 
 @login_required
 def home(request):
     tickets = Ticket.objects.filter(user=request.user)
-    return render(request, 'myapp/home.html', {'tickets': tickets})
+    return render(request, 'reviews/home.html', {'tickets': tickets})
+
 
 @login_required
 def create_ticket(request):
@@ -37,4 +39,5 @@ def create_ticket(request):
             return redirect('home')
     else:
         form = TicketForm()
-    return render(request, 'myapp/create_ticket.html', {'form': form})
+    return render(request, 'reviews/create_ticket.html', {'form': form})
+

@@ -1,0 +1,21 @@
+<h2>Rechercher un utilisateur à partir d’un ticket</h2>
+
+<form method="get">
+    <input type="text" name="query" placeholder="Titre ou description du ticket" value="{{ query }}">
+    <button type="submit">Rechercher</button>
+</form>
+
+{% if results %}
+    <ul>
+        {% for ticket in results %}
+            <li>
+                <strong>{{ ticket.title }}</strong><br>
+                <em>Écrit par : {{ ticket.user.username }}</em><br>
+                <small>Créé le : {{ ticket.time_created|date:"d/m/Y H:i" }}</small><br>
+                <p>{{ ticket.description }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% elif query %}
+    <p>Aucun ticket trouvé pour la recherche : "{{ query }}"</p>
+{% endif %}
