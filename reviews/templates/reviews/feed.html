@@ -1,0 +1,18 @@
+{% load classname %}
+
+{% for item in items %}
+    {% if item|classname == "Ticket" %}
+        <!-- Affichage spécifique pour un ticket -->
+        <div class="ticket">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+        </div>
+    {% elif item|classname == "Review" %}
+        <!-- Affichage spécifique pour une critique -->
+        <div class="review">
+            <strong>Critique de {{ item.user }}</strong>
+            <p>{{ item.rating }}/5</p>
+            <p>{{ item.comment }}</p>
+        </div>
+    {% endif %}
+{% endfor %}

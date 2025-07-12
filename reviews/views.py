@@ -17,6 +17,21 @@ from .models import Ticket
 from django.db.models import Q
 from django.http import HttpResponse
 from .forms import ArticleForm
+from django.contrib.auth.decorators import login_required
+from .models import Ticket, Comment, UserFollows
+from itertools import chain
+from django.utils import timezone
+from .models import Ticket, Review, UserFollows
+from django.shortcuts import redirect
+from .forms import FollowUserForm
+from .models import UserFollows
+from django.contrib import messages
+from .forms import FollowForm
+from django.shortcuts import get_object_or_404
+
+
+
+
 
 
 @login_required
@@ -139,5 +154,115 @@ def publish_article(request):
 
 
 
+
+@login_required
+def user_feed(request):
+    # Récupérer les utilisateurs suivis
+    followed_users = UserFollows.objects.filter(user=request.user).values_list('followed_user', flat=True)
+
+    # Récupérer les tickets et commentaires des suivis
+    tickets = Ticket.objects.filter(user__in=followed_users)
+    comments = Comment.objects.filter(user__in=followed_users)
+
+    # Fusionner et trier par date
+    feed_items = sorted(
+        chain(tickets, comments),
+        key=lambda instance: instance.created_at,
+        reverse=True
+    )
+
+    return render(request, 'reviews/feed.html', {'feed_items': feed_items})
+
+
+
+@login_required
+def followed_users_feed(request):
+    # Récupère les utilisateurs suivis
+    followed_users = UserFollows.objects.filter(user=request.user).values_list('followed_user', flat=True)
+
+    # Récupère les tickets et reviews de ces utilisateurs
+    tickets = Ticket.objects.filter(user__in=followed_users)
+    reviews = Review.objects.filter(user__in=followed_users)
+
+    # Fusionne et trie par ordre anté-chronologique
+    feed_items = sorted(
+        chain(tickets, reviews),
+        key=lambda instance: instance.time_created,
+        reverse=True
+    )
+
+    return render(request, 'reviews/followed_users_feed.html', {'items': feed_items})
+
+
+
+@login_required
+def follow_user(request):
+    if request.method == 'POST':
+        form = FollowUserForm(request.POST)
+        if form.is_valid():
+            followed_user = form.cleaned_data['username']
+            if followed_user != request.user:
+                UserFollows.objects.get_or_create(user=request.user, followed_user=followed_user)
+            return redirect('followed_users_feed')
+    else:
+        form = FollowUserForm()
+    return render(request, 'reviews/follow_user.html', {'form': form})
+
+
+
+
+@login_required
+def subscriptions_view(request):
+    user = request.user
+    following = UserFollows.objects.filter(user=user)
+    followers = UserFollows.objects.filter(followed_user=user)
+    return render(request, 'reviews/subscriptions.html', {
+        'following': following,
+        'followers': followers,
+    })
+
+
+
+@login_required
+def subscriptions_view(request):
+    user = request.user
+    following = UserFollows.objects.filter(user=user)
+    followers = UserFollows.objects.filter(followed_user=user)
+    form = FollowForm()
+
+    if request.method == 'POST':
+        form = FollowForm(request.POST)
+        if form.is_valid():
+            username_to_follow = form.cleaned_data['username']
+            try:
+                user_to_follow = User.objects.get(username=username_to_follow)
+
+                if user_to_follow == user:
+                    messages.error(request, "Vous ne pouvez pas vous suivre vous-même.")
+                elif UserFollows.objects.filter(user=user, followed_user=user_to_follow).exists():
+                    messages.warning(request, "Vous suivez déjà cet utilisateur.")
+                else:
+                    UserFollows.objects.create(user=user, followed_user=user_to_follow)
+                    messages.success(request, f"Vous suivez maintenant {username_to_follow}.")
+                    return redirect('subscriptions')
+            except User.DoesNotExist:
+                messages.error(request, "Cet utilisateur n'existe pas.")
+
+    return render(request, 'reviews/subscriptions.html', {
+        'following': following,
+        'followers': followers,
+        'form': form,
+    })
+
+
+@login_required
+def unsubscribe_view(request, follow_id):
+    follow = get_object_or_404(UserFollows, id=follow_id, user=request.user)
+
+    if request.method == 'POST':
+        follow.delete()
+        messages.success(request, f"Vous vous êtes désabonné de {follow.followed_user.username}.")
+
+    return redirect('subscriptions')
     
 

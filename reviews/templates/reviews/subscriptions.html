@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Mes abonnements</h2>
+
+<!-- MESSAGES -->
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<!-- FORMULAIRE -->
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Suivre</button>
+</form>
+
+<hr>
+
+<h3>Je suis :</h3>
+<ul>
+  {% for follow in following %}
+    <li>
+      {{ follow.followed_user.username }}
+      <form method="post" action="{% url 'unsubscribe' follow.id %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Se désabonner</button>
+      </form>
+    </li>
+  {% empty %}
+    <li>Vous ne suivez personne.</li>
+  {% endfor %}
+</ul>
+  {% for follow in followers %}
+    <li>{{ follow.user.username }}</li>
+  {% empty %}
+    <li>Personne ne vous suit pour le moment.</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'home' %}">Retour à l'accueil</a>
+{% endblock %}

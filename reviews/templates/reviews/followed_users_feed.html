@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load classname %}
+
+{% block content %}
+  <h2>Flux des utilisateurs suivis</h2>
+
+  {% for item in items %}
+    {% if item|classname == "Ticket" %}
+      <div class="ticket">
+        <strong>🎫 Ticket de {{ item.user.username }}</strong><br>
+        <em>{{ item.title }}</em><br>
+        {{ item.description }}
+        <hr>
+      </div>
+    {% elif item|classname == "Review" %}
+      <div class="review">
+        <strong>📝 Critique de {{ item.user.username }}</strong><br>
+        Note : {{ item.rating }} / 5<br>
+        Commentaire : {{ item.comment }}
+        <hr>
+      </div>
+    {% endif %}
+  {% empty %}
+    <p>Aucune activité récente des utilisateurs suivis.</p>
+  {% endfor %}
+{% endblock %}

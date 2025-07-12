@@ -3,6 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Ticket(models.Model):
     title = models.CharField(max_length=128)
     description = models.TextField(blank=True)
@@ -22,6 +23,39 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.headline} ({self.rating}/5)"
+
+
+class UserFollows(models.Model):
+    user = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
+    followed_user = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'followed_user')
+
+    def __str__(self):
+        return f"{self.user.username} suit {self.followed_user.username}"
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class UserFollows(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='following'
+    )
+    followed_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='followed_by'
+    )
+
+    class Meta:
+        unique_together = ('user', 'followed_user')
+
+    def __str__(self):
+        return f"{self.user.username} suit {self.followed_user.username}"
 
 
     
