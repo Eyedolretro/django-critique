@@ -25,3 +25,9 @@ class TicketForm(forms.ModelForm):
         fields = ['title', 'description']
 
 
+class ArticleForm(forms.Form):
+    content = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 6, 'placeholder': 'Écris ton article ici...'}),
+        label='Contenu de l’article'
+    )
+

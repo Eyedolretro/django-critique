@@ -15,6 +15,8 @@ from .models import Ticket
 from django.contrib.auth.models import User
 from .models import Ticket
 from django.db.models import Q
+from django.http import HttpResponse
+from .forms import ArticleForm
 
 
 @login_required
@@ -120,6 +122,20 @@ def search_user_by_ticket(request):
 
     return render(request, 'reviews/search_user.html', {'results': results, 'query': query})
 
+
+
+
+def publish_article(request):
+    if request.method == 'POST':
+        form = ArticleForm(request.POST)
+        if form.is_valid():
+            content = form.cleaned_data['content']
+            # Tu peux enregistrer l'article dans la base de données ici
+            return HttpResponse(f"Article publié : {content}")
+    else:
+        form = ArticleForm()
+    
+    return render(request, 'reviews/publish_article.html', {'form': form})
 
 
 

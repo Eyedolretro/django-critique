@@ -1,18 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+  <style>
+    .ticket-button {
+      display: inline-block;
+      background-color: #fef3c7;
+      border: 2px dashed #f59e0b;
+      color: #78350f;
+      padding: 15px 25px;
+      margin: 10px 10px 20px 0;
+      border-radius: 12px;
+      font-weight: bold;
+      text-decoration: none;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.2s ease;
+    }
+    .ticket-button:hover {
+      transform: scale(1.05);
+      background-color: #fde68a;
+    }
+  </style>
+
+  <h2>Mes tickets</h2>
   
-  <h2>Mes tickets</h2><a href="{% url 'search_user' %}">🔍 Rechercher un utilisateur</a>
   <p>Bonjour {{ request.user.username }} | <a href="{% url 'logout' %}">Déconnexion</a></p>
-  <a href="{% url 'create_ticket' %}">Créer un nouveau ticket</a> 
+
+  <!-- Nouveaux boutons -->
+  <a href="{% url 'create_ticket' %}" class="ticket-button">🎫 Demander un article / livre</a>
+  <a href="{% url 'publish_article' %}" class="ticket-button">📝 Publier un article</a>
 
   <ul>
-   
-
     {% for ticket in tickets %}
       <li>{{ ticket.title }} - {{ ticket.created_at }}</li>
     {% empty %}
       <li>Aucun ticket pour l'instant.</li>
     {% endfor %}
   </ul>
+
 {% endblock %}
+

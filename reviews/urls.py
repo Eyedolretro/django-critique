@@ -10,6 +10,7 @@ urlpatterns = [
     path('create_ticket/', views.create_ticket, name='create_ticket'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('search-user/', views.search_user_by_ticket, name='search_user'),
+     path('publish/', views.publish_article, name='publish_article'),
 ]
 
 
