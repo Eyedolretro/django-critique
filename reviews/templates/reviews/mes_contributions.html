@@ -7,16 +7,14 @@
   {% endfor %}
 </ul>
 
-<h2>📝 Mes publications</h2>
+<h2>📰 Mes articles</h2>
 <ul>
-  {% for pub in publications %}
+  {% for article in articles %}
     <li>
-      {{ pub.headline }} - {{ pub.created_at|date:"M d, Y, H:i" }}<br>
-      Sur le ticket : {{ pub.ticket.title }}<br>
-      Note : {{ pub.rating }}/5<br>
-      {{ pub.body }}
+      {{ article.content|truncatewords:25 }} <br>
+      <small>Publié le {{ article.created_at|date:"M d, Y, H:i" }}</small>
     </li>
   {% empty %}
-    <li>Vous n'avez pas encore publié de critique.</li>
+    <li>Vous n'avez pas encore rédigé d'article.</li>
   {% endfor %}
 </ul>

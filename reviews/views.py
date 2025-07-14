@@ -362,21 +362,18 @@ def feed_view(request):
         'form': form,
     })
 
-@login_required
 def mes_contributions(request):
     user = request.user
-
     tickets = Ticket.objects.filter(user=user).order_by('-created_at')
     publications = Review.objects.filter(user=user).order_by('-created_at')
-
-    print(f"Utilisateur connecté : {user.username}")
-    print(f"Tickets ({tickets.count()}): {[t.title for t in tickets]}")
-    print(f"Publications ({publications.count()}): {[p.headline for p in publications]}")
+    articles = Article.objects.filter(author=user).order_by('-created_at')  # <--- ajout
 
     return render(request, 'reviews/mes_contributions.html', {
         'tickets': tickets,
         'publications': publications,
+        'articles': articles,  # <--- ajout
     })
+
 
 
 @login_required
