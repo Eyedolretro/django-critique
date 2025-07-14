@@ -1,0 +1,22 @@
+<h2>🎫 Mes tickets</h2>
+<ul>
+  {% for ticket in tickets %}
+    <li>{{ ticket.title }} - {{ ticket.created_at|date:"M d, Y, H:i" }}</li>
+  {% empty %}
+    <li>Aucun ticket trouvé.</li>
+  {% endfor %}
+</ul>
+
+<h2>📝 Mes publications</h2>
+<ul>
+  {% for pub in publications %}
+    <li>
+      {{ pub.headline }} - {{ pub.created_at|date:"M d, Y, H:i" }}<br>
+      Sur le ticket : {{ pub.ticket.title }}<br>
+      Note : {{ pub.rating }}/5<br>
+      {{ pub.body }}
+    </li>
+  {% empty %}
+    <li>Vous n'avez pas encore publié de critique.</li>
+  {% endfor %}
+</ul>

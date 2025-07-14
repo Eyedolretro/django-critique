@@ -1,26 +1,60 @@
-{% extends 'base.html' %}
-{% load classname %}
+{% load custom_filters %}
 
-{% block content %}
-  <h2>Flux des utilisateurs suivis</h2>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Flux des utilisateurs suivis</title>
+</head>
+<body>
 
-  {% for item in items %}
-    {% if item|classname == "Ticket" %}
-      <div class="ticket">
-        <strong>🎫 Ticket de {{ item.user.username }}</strong><br>
-        <em>{{ item.title }}</em><br>
-        {{ item.description }}
-        <hr>
-      </div>
-    {% elif item|classname == "Review" %}
-      <div class="review">
-        <strong>📝 Critique de {{ item.user.username }}</strong><br>
-        Note : {{ item.rating }} / 5<br>
-        Commentaire : {{ item.comment }}
-        <hr>
-      </div>
-    {% endif %}
-  {% empty %}
-    <p>Aucune activité récente des utilisateurs suivis.</p>
-  {% endfor %}
-{% endblock %}
+<h1 style="color: green;">✅ Flux chargé</h1>
+
+{% if items %}
+    {% for item in items %}
+        <div style="border: 1px solid #aaa; margin: 20px; padding: 10px;">
+            <p><strong>Type :</strong> {{ item|classname }}</p>
+            <p><strong>Données brutes :</strong> {{ item }}</p>
+
+            {% if item|classname == "Review" %}
+                <h3>📝 Critique par {{ item.user.username }}</h3>
+                <p><strong>Titre :</strong> {{ item.title }}</p>
+                <p><strong>Note :</strong> {{ item.rating }}/5</p>
+                <p>{{ item.content }}</p>
+                <small>Posté le {{ item.time_created }}</small>
+
+                <h4>💬 Réponses :</h4>
+                {% for response in item.responses.all %}
+                    <div style="margin-left: 20px;">
+                        <strong>{{ response.responder.username }}</strong> : {{ response.content }}
+                    </div>
+                {% empty %}
+                    <p>Aucune réponse.</p>
+                {% endfor %}
+
+                {% if user.is_authenticated %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="review_id" value="{{ item.id }}">
+                        {{ form.as_p }}
+                        <button type="submit">Répondre</button>
+                    </form>
+                {% else %}
+                    <p><a href="{% url 'login' %}">Connectez-vous pour répondre</a></p>
+                {% endif %}
+            {% elif item|classname == "Ticket" %}
+                <h3>🎟️ Ticket créé par {{ item.user.username }}</h3>
+                <p><strong>Titre :</strong> {{ item.title }}</p>
+                <p>{{ item.description }}</p>
+                <small>Créé le {{ item.time_created }}</small>
+            {% else %}
+                <p>Type non reconnu.</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Aucun élément dans le flux.</p>
+{% endif %}
+
+</body>
+</html>

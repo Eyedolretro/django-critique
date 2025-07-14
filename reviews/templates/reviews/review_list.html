@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Liste des critiques</title>
+</head>
+<body>
+    <h1>Liste des critiques</h1>
+
+    {% if reviews %}
+        <ul>
+            {% for review in reviews %}
+                <li>
+                    <strong>{{ review.title }}</strong> par {{ review.author.username }} <br>
+                    {{ review.content|truncatechars:150 }}
+                    <br>
+                    <a href="{% url 'review_detail' review.pk %}">Voir / Répondre</a>
+                </li>
+                <hr>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucune critique disponible pour le moment.</p>
+    {% endif %}
+
+</body>
+</html>

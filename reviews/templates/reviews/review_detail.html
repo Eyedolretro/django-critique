@@ -1,0 +1,27 @@
+<h2>{{ review.title }}</h2>
+<p>{{ review.content }}</p>
+<p><em>Publié par {{ review.author }}</em></p>
+
+<hr>
+<h3>Droits de réponse</h3>
+{% for response in responses %}
+    <div>
+        <strong>{{ response.responder }}</strong> a répondu :
+        <p>{{ response.content }}</p>
+        <small>{{ response.created_at }}</small>
+    </div>
+{% empty %}
+    <p>Aucun droit de réponse pour le moment.</p>
+{% endfor %}
+
+{% if user.is_authenticated %}
+    <hr>
+    <h4>Ajouter un droit de réponse</h4>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Répondre</button>
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}">Connectez-vous</a> pour répondre.</p>
+{% endif %}

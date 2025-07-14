@@ -2,6 +2,7 @@ from django import forms
 from .models import Review
 from .models import Ticket
 from django.contrib.auth.models import User
+from .models import Response
 
 
 class ReviewForm(forms.ModelForm):
@@ -46,4 +47,15 @@ class FollowUserForm(forms.Form):
 
 class FollowForm(forms.Form):
     username = forms.CharField(label="Nom d'utilisateur à suivre", max_length=150)
+
+
+
+
+class ResponseForm(forms.ModelForm):
+    class Meta:
+        model = Response
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Votre droit de réponse...'}),
+        }
 

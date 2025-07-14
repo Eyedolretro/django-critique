@@ -1,18 +1,51 @@
 {% load classname %}
 
+<h1>📡 Flux des utilisateurs suivis</h1>
+
 {% for item in items %}
     {% if item|classname == "Ticket" %}
-        <!-- Affichage spécifique pour un ticket -->
-        <div class="ticket">
-            <h3>{{ item.title }}</h3>
+        <!-- 🎫 Affichage d’un ticket -->
+        <div class="ticket" style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px;">
+            <h3>🎫 Ticket de {{ item.user.username }}</h3>
+            <p><strong>Titre :</strong> {{ item.title }}</p>
             <p>{{ item.description }}</p>
+            <small>Posté le {{ item.time_created|date:"d M Y H:i" }}</small>
         </div>
+
     {% elif item|classname == "Review" %}
-        <!-- Affichage spécifique pour une critique -->
-        <div class="review">
-            <strong>Critique de {{ item.user }}</strong>
-            <p>{{ item.rating }}/5</p>
-            <p>{{ item.comment }}</p>
+        <!-- 📝 Affichage d’une critique -->
+        <div class="review" style="border: 1px solid #aaa; padding: 15px; margin-bottom: 20px;">
+            <h3>📝 Critique de {{ item.user.username }}</h3>
+            <p><strong>Titre :</strong> {{ item.title }}</p>
+            <p><strong>Note :</strong> {{ item.rating }}/5</p>
+            <p>{{ item.content }}</p>
+            <small>Posté le {{ item.time_created|date:"d M Y H:i" }}</small>
+
+            <!-- 💬 Droits de réponse -->
+            <h4 style="margin-top: 15px;">💬 Droits de réponse</h4>
+            {% if item.responses.all %}
+                {% for response in item.responses.all %}
+                    <div style="margin-left: 20px; border-left: 3px solid #ccc; padding-left: 10px; margin-top: 10px;">
+                        <strong>{{ response.responder.username }}</strong> :
+                        {{ response.content }}<br>
+                        <small>le {{ response.created_at|date:"d M Y H:i" }}</small>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Aucun droit de réponse pour l’instant.</p>
+            {% endif %}
+
+            <!-- ✍️ Formulaire de réponse -->
+            {% if user.is_authenticated %}
+                <form method="post" style="margin-top: 15px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="review_id" value="{{ item.id }}">
+                    {{ form.as_p }}
+                    <button type="submit">Répondre</button>
+                </form>
+            {% else %}
+                <p><a href="{% url 'login' %}">Connectez-vous pour répondre</a></p>
+            {% endif %}
         </div>
     {% endif %}
 {% endfor %}

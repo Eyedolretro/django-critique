@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Ticket(models.Model):
@@ -9,6 +10,7 @@ class Ticket(models.Model):
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    time_created = models.DateTimeField(default=timezone.now) 
 
     def __str__(self):
         return self.title
@@ -23,6 +25,10 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.headline} ({self.rating}/5)"
+
+    @property
+    def classname(self):
+        return self.__class__.__name__
 
 
 class UserFollows(models.Model):
@@ -56,6 +62,16 @@ class UserFollows(models.Model):
 
     def __str__(self):
         return f"{self.user.username} suit {self.followed_user.username}"
+
+
+class Response(models.Model):
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='responses')
+    responder = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']   
 
 
     

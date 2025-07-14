@@ -1,0 +1,13 @@
+{% for item in items %}
+    {% if item.classname == "Review" %}
+        <p>Ceci est un Review : {{ item.title }}</p>
+    {% endif %}
+{% endfor %}
+
+{% load reviews_extras %}
+
+{% for item in items %}
+    {% if item|classname == "Review" %}
+        <p>Ceci est un Review : {{ item.title }}</p>
+    {% endif %}
+{% endfor %}

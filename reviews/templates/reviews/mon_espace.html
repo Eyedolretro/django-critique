@@ -1,0 +1,17 @@
+<h2>🎫 Mes tickets</h2>
+<ul>
+  {% for ticket in tickets %}
+    <li><strong>{{ ticket.titre }}</strong> - {{ ticket.date_creation }}</li>
+  {% empty %}
+    <li>Vous n'avez pas encore fait de demande.</li>
+  {% endfor %}
+</ul>
+
+<h2>📝 Mes publications</h2>
+<ul>
+  {% for pub in publications %}
+    <li><strong>{{ pub.titre }}</strong> - {{ pub.date_creation }}</li>
+  {% empty %}
+    <li>Vous n'avez pas encore publié d'article.</li>
+  {% endfor %}
+</ul>

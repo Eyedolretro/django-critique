@@ -28,6 +28,13 @@ from .models import UserFollows
 from django.contrib import messages
 from .forms import FollowForm
 from django.shortcuts import get_object_or_404
+from .models import Review, Response
+from .forms import ResponseForm
+from .models import Review
+from .models import Ticket, Review, Response, UserFollows
+
+
+
 
 
 
@@ -177,23 +184,45 @@ def user_feed(request):
 
 @login_required
 def followed_users_feed(request):
-    # Récupère les utilisateurs suivis
+    # Récupération des utilisateurs suivis
     followed_users = UserFollows.objects.filter(user=request.user).values_list('followed_user', flat=True)
-
-    # Récupère les tickets et reviews de ces utilisateurs
+    
+    # Récupérer tickets et reviews des suivis
     tickets = Ticket.objects.filter(user__in=followed_users)
     reviews = Review.objects.filter(user__in=followed_users)
 
-    # Fusionne et trie par ordre anté-chronologique
+    # Fusionner et trier par date (attention à la clé, tickets et reviews ont probablement des noms différents pour la date)
     feed_items = sorted(
         chain(tickets, reviews),
-        key=lambda instance: instance.time_created,
+        key=lambda instance: getattr(instance, 'time_created', getattr(instance, 'created_at', None)),
         reverse=True
     )
 
-    return render(request, 'reviews/followed_users_feed.html', {'items': feed_items})
+    if request.method == 'POST':
+        form = ResponseForm(request.POST)
+        if form.is_valid():
+            review_id = request.POST.get('review_id')
+            try:
+                review = Review.objects.get(pk=review_id)
+            except Review.DoesNotExist:
+                messages.error(request, "Critique introuvable.")
+                return redirect('followed_users_feed')
 
+            response = form.save(commit=False)
+            response.review = review
+            response.responder = request.user
+            response.save()
+            messages.success(request, "Réponse enregistrée avec succès.")
+            return redirect('followed_users_feed')
+        else:
+            messages.error(request, "Formulaire invalide, veuillez vérifier les champs.")
+    else:
+        form = ResponseForm()
 
+    return render(request, 'reviews/followed_users_feed.html', {
+        'items': feed_items,
+        'form': form,
+    })
 
 @login_required
 def follow_user(request):
@@ -264,5 +293,83 @@ def unsubscribe_view(request, follow_id):
         messages.success(request, f"Vous vous êtes désabonné de {follow.followed_user.username}.")
 
     return redirect('subscriptions')
+
+
+
+
+@login_required
+def create_review_for_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.ticket = ticket
+            review.user = request.user
+            review.save()
+            return redirect('flux')  # ou autre page souhaitée
+    else:
+        form = ReviewForm()
+
+    return render(request, 'reviews/create_review.html', {
+        'form': form,
+        'ticket': ticket
+    })
     
 
+
+
+@login_required
+def review_detail(request, pk):
+    review = get_object_or_404(Review, pk=pk)
+    responses = review.responses.all()
+    
+    if request.method == 'POST':
+        form = ResponseForm(request.POST)
+        if form.is_valid():
+            response = form.save(commit=False)
+            response.review = review
+            response.responder = request.user
+            response.save()
+            return redirect('review_detail', pk=review.pk)
+    else:
+        form = ResponseForm()
+
+    return render(request, 'reviews/review_detail.html', {
+        'review': review,
+        'responses': responses,
+        'form': form,
+    })
+
+
+
+def review_list(request):
+    reviews = Review.objects.all().order_by('-created_at')
+    return render(request, 'reviews/review_list.html', {'reviews': reviews})
+
+
+
+def feed_view(request):
+    feed = get_user_feed(request.user)  # exemple
+    form = ResponseForm()
+    return render(request, 'followed_users_feed.html', {
+        'feed': feed,
+        'form': form,
+    })
+
+@login_required
+def mes_contributions(request):
+    user = request.user
+
+    tickets = Ticket.objects.filter(user=user).order_by('-created_at')
+    publications = Review.objects.filter(user=user).order_by('-created_at')
+
+    print(f"Utilisateur connecté : {user.username}")
+    print(f"Tickets ({tickets.count()}): {[t.title for t in tickets]}")
+    print(f"Publications ({publications.count()}): {[p.headline for p in publications]}")
+
+    return render(request, 'reviews/mes_contributions.html', {
+        'tickets': tickets,
+        'publications': publications,
+    })

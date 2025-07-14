@@ -79,9 +79,18 @@
     <footer>
         <p>&copy; 2025 - CritiqueHub</p>
     </footer>
-    <a href="{% url 'subscriptions' %}">Mes abonnements</a>
+    <a href="{% url 'subscriptions' %}">Mes abonnements</a>{% if ticket %}
+    <a href="{% url 'create_review' ticket.id %}">Critiquer</a>
+{% endif %}
+
+
 
     <a href="{% url 'followed_users_feed' %}">Flux suivi</a>
+
+    <a href="{% url 'mes_contributions' %}">📚 Mon espace</a>
+
+
+    
 
 </body>
 </html>
