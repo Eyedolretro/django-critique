@@ -34,6 +34,7 @@ class ArticleForm(forms.Form):
     )
 
 
+
 class FollowUserForm(forms.Form):
     username = forms.CharField(label="Nom d'utilisateur à suivre")
 

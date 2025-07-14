@@ -19,6 +19,8 @@ urlpatterns = [
     path('review/<int:pk>/', views.review_detail, name='review_detail'),
     path('reviews/', views.review_list, name='review_list'),
     path('mes-contributions/', views.mes_contributions, name='mes_contributions'),
+    path('publier-article/', views.publish_article, name='publish_article'),
+    path('mes-articles/', views.mes_articles, name='mes_articles'),
 ]
 
 

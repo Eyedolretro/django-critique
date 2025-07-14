@@ -32,6 +32,8 @@ from .models import Review, Response
 from .forms import ResponseForm
 from .models import Review
 from .models import Ticket, Review, Response, UserFollows
+from .models import Article
+
 
 
 
@@ -147,13 +149,15 @@ def search_user_by_ticket(request):
 
 
 
+@login_required
 def publish_article(request):
     if request.method == 'POST':
         form = ArticleForm(request.POST)
         if form.is_valid():
             content = form.cleaned_data['content']
-            # Tu peux enregistrer l'article dans la base de données ici
-            return HttpResponse(f"Article publié : {content}")
+            Article.objects.create(content=content, author=request.user)
+            messages.success(request, "Article publié !")
+            return redirect('mes_articles')
     else:
         form = ArticleForm()
     
@@ -373,3 +377,9 @@ def mes_contributions(request):
         'tickets': tickets,
         'publications': publications,
     })
+
+
+@login_required
+def mes_articles(request):
+    articles = Article.objects.filter(author=request.user).order_by('-created_at')
+    return render(request, 'reviews/mes_articles.html', {'articles': articles})

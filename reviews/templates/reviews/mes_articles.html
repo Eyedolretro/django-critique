@@ -1,0 +1,8 @@
+<h2>📝 Mes articles</h2>
+<ul>
+  {% for article in articles %}
+    <li>{{ article.created_at|date:"d/m/Y H:i" }}<br>{{ article.content|linebreaks }}</li>
+  {% empty %}
+    <li>Vous n’avez encore publié aucun article.</li>
+  {% endfor %}
+</ul>
