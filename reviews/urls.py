@@ -21,6 +21,8 @@ urlpatterns = [
     path('mes-contributions/', views.mes_contributions, name='mes_contributions'),
     path('publier-article/', views.publish_article, name='publish_article'),
     path('mes-articles/', views.mes_articles, name='mes_articles'),
+    path('article/<int:article_id>/edit/', views.edit_article, name='edit_article'),
+    path('article/<int:article_id>/delete/', views.delete_article, name='delete_article'),
 ]
 
 

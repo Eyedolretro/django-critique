@@ -380,3 +380,34 @@ def mes_contributions(request):
 def mes_articles(request):
     articles = Article.objects.filter(author=request.user).order_by('-created_at')
     return render(request, 'reviews/mes_articles.html', {'articles': articles})
+
+
+
+@login_required
+def edit_article(request, article_id):
+    article = get_object_or_404(Article, id=article_id, author=request.user)
+
+    if request.method == "POST":
+        form = ArticleForm(request.POST, instance=article)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Article modifié avec succès.")
+            return redirect('mes_contributions')
+    else:
+        form = ArticleForm(instance=article)
+
+    return render(request, 'reviews/edit_article.html', {'form': form})
+
+
+
+
+@login_required
+def delete_article(request, article_id):
+    article = get_object_or_404(Article, id=article_id, author=request.user)
+
+    if request.method == "POST":
+        article.delete()
+        messages.success(request, "Article supprimé.")
+        return redirect('mes_contributions')
+
+    return render(request, 'reviews/delete_article.html', {'article': article})

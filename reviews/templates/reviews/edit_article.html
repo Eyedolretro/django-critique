@@ -1,0 +1,7 @@
+<h2>✏️ Modifier l'article</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Enregistrer</button>
+  <a href="{% url 'mes_contributions' %}">Annuler</a>
+</form>

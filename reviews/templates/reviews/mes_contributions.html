@@ -11,10 +11,13 @@
 <ul>
   {% for article in articles %}
     <li>
-      {{ article.content|truncatewords:25 }} <br>
-      <small>Publié le {{ article.created_at|date:"M d, Y, H:i" }}</small>
+      {{ article.content|truncatewords:25 }}<br>
+      <small>Publié le {{ article.created_at|date:"M d, Y, H:i" }}</small><br>
+      <a href="{% url 'edit_article' article.id %}">✏️ Modifier</a> |
+      <a href="{% url 'delete_article' article.id %}">🗑️ Supprimer</a>
     </li>
   {% empty %}
     <li>Vous n'avez pas encore rédigé d'article.</li>
   {% endfor %}
 </ul>
+

@@ -3,7 +3,7 @@ from .models import Review
 from .models import Ticket
 from django.contrib.auth.models import User
 from .models import Response
-
+from .models import Article
 
 class ReviewForm(forms.ModelForm):
     class Meta:
@@ -27,11 +27,13 @@ class TicketForm(forms.ModelForm):
         fields = ['title', 'description']
 
 
-class ArticleForm(forms.Form):
-    content = forms.CharField(
-        widget=forms.Textarea(attrs={'rows': 6, 'placeholder': 'Écris ton article ici...'}),
-        label='Contenu de l’article'
-    )
+class ArticleForm(forms.ModelForm):
+    class Meta:
+        model = Article
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 5}),
+        }
 
 
 
