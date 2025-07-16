@@ -5,19 +5,18 @@ from django.contrib.auth.models import User
 from .models import Response
 from .models import Article
 
+
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ['headline', 'body', 'rating']
-        widgets = {
-            'headline': forms.TextInput(attrs={'class': 'form-control'}),
-            'body': forms.Textarea(attrs={'class': 'form-control'}),
-            'rating': forms.Select(attrs={'class': 'form-control'}),
-        }
+        fields = ['content', 'rating']  # ✅ Les vrais noms de champs de ton modèle
         labels = {
-            'headline': 'Titre',
-            'body': 'Critique',
-            'rating': 'Note (1 à 5)',
+            'content': 'Votre critique',
+            'rating': 'Note (sur 5)',
+        }
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 4}),
+            'rating': forms.NumberInput(attrs={'min': 0, 'max': 5}),
         }
 
 

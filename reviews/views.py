@@ -33,6 +33,7 @@ from .forms import ResponseForm
 from .models import Review
 from .models import Ticket, Review, Response, UserFollows
 from .models import Article
+from django.db.models import Prefetch
 
 
 
@@ -188,45 +189,46 @@ def user_feed(request):
 
 @login_required
 def followed_users_feed(request):
-    # Récupération des utilisateurs suivis
-    followed_users = UserFollows.objects.filter(user=request.user).values_list('followed_user', flat=True)
-    
-    # Récupérer tickets et reviews des suivis
-    tickets = Ticket.objects.filter(user__in=followed_users)
-    reviews = Review.objects.filter(user__in=followed_users)
+    user = request.user
 
-    # Fusionner et trier par date (attention à la clé, tickets et reviews ont probablement des noms différents pour la date)
-    feed_items = sorted(
+    # Récupérer les utilisateurs suivis
+    followed_users = UserFollows.objects.filter(user=user).values_list('followed_user', flat=True)
+
+    # Précharger les réponses liées à chaque review
+    reviews = Review.objects.filter(user__in=followed_users).prefetch_related(
+        Prefetch('responses', queryset=Response.objects.select_related('responder'))
+    )
+
+    # Tickets des utilisateurs suivis
+    tickets = Ticket.objects.filter(user__in=followed_users)
+
+    # ⬇️ C’est ici que tu remplaces l'ancien tri par celui-ci
+    items = sorted(
         chain(tickets, reviews),
-        key=lambda instance: getattr(instance, 'time_created', getattr(instance, 'created_at', None)),
+        key=lambda item: item.created_at,  # Assure-toi que les deux modèles ont bien ce champ
         reverse=True
     )
 
+    # Gestion du formulaire de réponse (POST)
     if request.method == 'POST':
         form = ResponseForm(request.POST)
         if form.is_valid():
             review_id = request.POST.get('review_id')
-            try:
-                review = Review.objects.get(pk=review_id)
-            except Review.DoesNotExist:
-                messages.error(request, "Critique introuvable.")
-                return redirect('followed_users_feed')
-
+            review = get_object_or_404(Review, pk=review_id)
             response = form.save(commit=False)
             response.review = review
-            response.responder = request.user
+            response.responder = user
             response.save()
-            messages.success(request, "Réponse enregistrée avec succès.")
             return redirect('followed_users_feed')
-        else:
-            messages.error(request, "Formulaire invalide, veuillez vérifier les champs.")
     else:
         form = ResponseForm()
 
-    return render(request, 'reviews/followed_users_feed.html', {
-        'items': feed_items,
+    context = {
+        'items': items,
         'form': form,
-    })
+        'user': user
+    }
+    return render(request, 'reviews/followed_users_feed.html', context)
 
 @login_required
 def follow_user(request):
@@ -411,3 +413,22 @@ def delete_article(request, article_id):
         return redirect('mes_contributions')
 
     return render(request, 'reviews/delete_article.html', {'article': article})
+
+
+
+@login_required
+def my_posts(request):
+    user = request.user
+
+    reviews = Review.objects.filter(user=user).prefetch_related(
+        Prefetch('responses', queryset=Response.objects.select_related('responder'))
+    )
+
+    tickets = Ticket.objects.filter(user=user)
+
+    context = {
+        'reviews': reviews,
+        'tickets': tickets,
+    }
+
+    return render(request, 'reviews/my_posts.html', context)

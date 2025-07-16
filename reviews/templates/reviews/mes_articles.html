@@ -6,3 +6,18 @@
     <li>Vous n’avez encore publié aucun article.</li>
   {% endfor %}
 </ul>
+{% for review in reviews %}
+    <div class="review">
+        <h3>📝 Critique par {{ review.user.username }}</h3>
+        <p>Note : {{ review.rating }}/5</p>
+        <p>{{ review.content }}</p>
+        <p>Posté le {{ review.time_created|date:"M d, Y H:i" }}</p>
+
+        <h4>💬 Réponses :</h4>
+        {% for response in review.responses.all %}
+            <p><strong>{{ response.responder.username }} :</strong> {{ response.content }} ({{ response.created_at|date:"M d, Y H:i" }})</p>
+        {% empty %}
+            <p>Aucune réponse pour cette critique.</p>
+        {% endfor %}
+    </div>
+{% endfor %}
