@@ -10,64 +10,96 @@
         .card { background: #fff; border: 1px solid #ccc; margin-bottom: 20px; padding: 15px; border-radius: 8px; }
         .response { margin-left: 20px; padding: 5px 0; }
         .form-block { margin-top: 10px; }
+
+        .navbar {
+            background: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .navbar a {
+            text-decoration: none;
+            background: #4CAF50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background: #45a049;
+        }
     </style>
 </head>
 <body>
 
-<h1 style="color: green;">✅ Flux chargé</h1>
+    <div class="navbar">
+        <a href="{% url 'create_ticket' %}">🎟️ Créer un ticket</a>
+        <a href="{% url 'mes_contributions' %}">📚 Mes contributions</a>
+        <a href="{% url 'mes_articles' %}">📰 Mes articles</a>
+        <a href="{% url 'publish_article' %}">📝 Publier un article</a>
+        <a href="{% url 'review_list' %}">💬 Toutes les critiques</a>
+        <a href="{% url 'subscriptions' %}">👥 Abonnements</a>
+        <a href="{% url 'logout' %}">🚪 Déconnexion</a>
+    </div>
 
-{% if items %}
-    {% for item in items %}
-        <div class="card">
-            {% if item.feed_type == "review" %}
-                <h3>📝 Critique par {{ item.user.username }}</h3>
-                {% if item.title %}
+    <h1 style="color: green;">✅ Flux chargé</h1>
+
+    {% if items %}
+        {% for item in items %}
+            <div class="card">
+                <p><strong>Type :</strong> {{ item|classname }}</p>
+
+                {% if item|classname == "Review" %}
+                    <h3>📝 Critique par {{ item.user.username }}</h3>
+                    {% if item.ticket %}
+                        <p><strong>Ticket associé :</strong> {{ item.ticket.title }}</p>
+                    {% endif %}
+                    <p><strong>Note :</strong> {{ item.rating }}/5</p>
+                    <p>{{ item.content }}</p>
+                    <small>Posté le {{ item.created_at|date:"d M Y, H:i" }}</small>
+
+                    <h4>💬 Réponses :</h4>
+                    {% for response in item.responses.all %}
+                        <div class="response">
+                            <strong>{{ response.responder.username }}</strong> : {{ response.content }}
+                        </div>
+                    {% empty %}
+                        <p>Aucune réponse pour cette critique.</p>
+                    {% endfor %}
+
+                    {% if user.is_authenticated %}
+                        <div class="form-block">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="review_id" value="{{ item.id }}">
+                                {{ form.as_p }}
+                                <button type="submit">Répondre</button>
+                            </form>
+                        </div>
+                    {% endif %}
+
+                {% elif item|classname == "Ticket" %}
+                    <h3>🎟️ Ticket créé par {{ item.user.username }}</h3>
                     <p><strong>Titre :</strong> {{ item.title }}</p>
+                    <p>{{ item.description }}</p>
+                    <small>Créé le {{ item.created_at|date:"d M Y, H:i" }}</small>
+
+                {% else %}
+                    <p>Type non reconnu.</p>
                 {% endif %}
-                <p><strong>Note :</strong> {{ item.rating }}/5</p>
-                <p>{{ item.content }}</p>
-                <small>Posté le {{ item.created_at|date:"d M Y, H:i" }}</small>
-
-                <h4>💬 Réponses :</h4>
-                {% for response in item.responses.all %}
-                    <div class="response">
-                        <strong>{{ response.responder.username }}</strong> : {{ response.content }}
-                    </div>
-                {% empty %}
-                    <p>Aucune réponse pour cette critique.</p>
-                {% endfor %}
-
-                {% if user.is_authenticated %}
-                    <div class="form-block">
-                        <form method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="review_id" value="{{ item.id }}">
-                            {{ form.as_p }}
-                            <button type="submit">Répondre</button>
-                        </form>
-                    </div>
-                {% endif %}
-
-            {% elif item.feed_type == "ticket" %}
-                <h3>🎟️ Ticket créé par {{ item.user.username }}</h3>
-                <p><strong>Titre :</strong> {{ item.title }}</p>
-                <p>{{ item.description }}</p>
-                <small>Créé le {{ item.created_at|date:"d M Y, H:i" }}</small>
-
-            {% elif item.feed_type == "response" %}
-                <h3>💬 Réponse postée par {{ item.responder.username }}</h3>
-                <p>{{ item.content }}</p>
-                <p><em>Sur la critique de {{ item.review.user.username }}</em></p>
-                <small>Répondu le {{ item.created_at|date:"d M Y, H:i" }}</small>
-
-            {% else %}
-                <p>Type inconnu.</p>
-            {% endif %}
-        </div>
-    {% endfor %}
-{% else %}
-    <p>Aucun élément dans le flux.</p>
-{% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Aucun élément dans le flux.</p>
+    {% endif %}
 
 </body>
 </html>
