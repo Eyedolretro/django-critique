@@ -19,17 +19,14 @@
 {% if items %}
     {% for item in items %}
         <div class="card">
-            <p><strong>Type :</strong> {{ item|classname }}</p>
-
-            {% if item|classname == "Review" %}
+            {% if item.feed_type == "review" %}
                 <h3>📝 Critique par {{ item.user.username }}</h3>
                 {% if item.title %}
                     <p><strong>Titre :</strong> {{ item.title }}</p>
                 {% endif %}
                 <p><strong>Note :</strong> {{ item.rating }}/5</p>
                 <p>{{ item.content }}</p>
-                <small>Posté le {{ item.created_at|date:"M d, Y, H:i" }}</small>
-
+                <small>Posté le {{ item.created_at|date:"d M Y, H:i" }}</small>
 
                 <h4>💬 Réponses :</h4>
                 {% for response in item.responses.all %}
@@ -49,19 +46,22 @@
                             <button type="submit">Répondre</button>
                         </form>
                     </div>
-                {% else %}
-                    <p><a href="{% url 'login' %}">Connectez-vous pour répondre</a></p>
                 {% endif %}
 
-            {% elif item|classname == "Ticket" %}
+            {% elif item.feed_type == "ticket" %}
                 <h3>🎟️ Ticket créé par {{ item.user.username }}</h3>
                 <p><strong>Titre :</strong> {{ item.title }}</p>
                 <p>{{ item.description }}</p>
-                <small>Créé le {{ item.created_at|date:"M d, Y, H:i" }}</small>
+                <small>Créé le {{ item.created_at|date:"d M Y, H:i" }}</small>
 
+            {% elif item.feed_type == "response" %}
+                <h3>💬 Réponse postée par {{ item.responder.username }}</h3>
+                <p>{{ item.content }}</p>
+                <p><em>Sur la critique de {{ item.review.user.username }}</em></p>
+                <small>Répondu le {{ item.created_at|date:"d M Y, H:i" }}</small>
 
             {% else %}
-                <p>Type non reconnu.</p>
+                <p>Type inconnu.</p>
             {% endif %}
         </div>
     {% endfor %}

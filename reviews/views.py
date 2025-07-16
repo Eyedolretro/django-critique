@@ -190,24 +190,47 @@ def user_feed(request):
 @login_required
 def followed_users_feed(request):
     user = request.user
-
-    # Récupérer les utilisateurs suivis
     followed_users = UserFollows.objects.filter(user=user).values_list('followed_user', flat=True)
 
-    # Précharger les réponses liées à chaque review
-    reviews = Review.objects.filter(user__in=followed_users).prefetch_related(
-        Prefetch('responses', queryset=Response.objects.select_related('responder'))
-    )
-
-    # Tickets des utilisateurs suivis
     tickets = Ticket.objects.filter(user__in=followed_users)
+    reviews = Review.objects.filter(user__in=followed_users)
+    responses = Response.objects.filter(responder__in=followed_users)
 
-    # ⬇️ C’est ici que tu remplaces l'ancien tri par celui-ci
+    # on ajoute un champ virtuel "type" pour distinguer dans le template
+    for obj in tickets:
+        obj.feed_type = "ticket"
+    for obj in reviews:
+        obj.feed_type = "review"
+    for obj in responses:
+        obj.feed_type = "response"
+
     items = sorted(
-        chain(tickets, reviews),
-        key=lambda item: item.created_at,  # Assure-toi que les deux modèles ont bien ce champ
+        chain(tickets, reviews, responses),
+        key=lambda item: item.created_at,
         reverse=True
     )
+
+    # gestion du formulaire de réponse à une Review
+    if request.method == 'POST':
+        form = ResponseForm(request.POST)
+        if form.is_valid():
+            review_id = request.POST.get('review_id')
+            review = get_object_or_404(Review, pk=review_id)
+            response = form.save(commit=False)
+            response.review = review
+            response.responder = user
+            response.save()
+            return redirect('followed_users_feed')
+    else:
+        form = ResponseForm()
+
+    context = {
+        'items': items,
+        'form': form,
+        'user': user
+    }
+    return render(request, 'reviews/followed_users_feed.html', context)
+
 
     # Gestion du formulaire de réponse (POST)
     if request.method == 'POST':
