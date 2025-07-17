@@ -284,33 +284,24 @@ def subscriptions_view(request):
 @login_required
 def subscriptions_view(request):
     user = request.user
+
+    # Utilisateurs que je suis
     following = UserFollows.objects.filter(user=user)
-    followers = UserFollows.objects.filter(followed_user=user)
-    form = FollowForm()
 
-    if request.method == 'POST':
-        form = FollowForm(request.POST)
-        if form.is_valid():
-            username_to_follow = form.cleaned_data['username']
-            try:
-                user_to_follow = User.objects.get(username=username_to_follow)
+    # Utilisateurs suivis (juste les utilisateurs, pas les objets UserFollows)
+    followed_users = [f.followed_user for f in following]
 
-                if user_to_follow == user:
-                    messages.error(request, "Vous ne pouvez pas vous suivre vous-même.")
-                elif UserFollows.objects.filter(user=user, followed_user=user_to_follow).exists():
-                    messages.warning(request, "Vous suivez déjà cet utilisateur.")
-                else:
-                    UserFollows.objects.create(user=user, followed_user=user_to_follow)
-                    messages.success(request, f"Vous suivez maintenant {username_to_follow}.")
-                    return redirect('subscriptions')
-            except User.DoesNotExist:
-                messages.error(request, "Cet utilisateur n'existe pas.")
+    # Pour chaque utilisateur que je suis, on récupère ses abonnés
+    followers_of_followed = {
+        u: UserFollows.objects.filter(followed_user=u) for u in followed_users
+    }
 
-    return render(request, 'reviews/subscriptions.html', {
-        'following': following,
-        'followers': followers,
-        'form': form,
-    })
+    context = {
+        'following': followed_users,  # liste de User
+        'followers_of_followed': followers_of_followed,  # dict user -> [UserFollows]
+    }
+    return render(request, 'reviews/subscriptions.html', context)
+
 
 
 @login_required

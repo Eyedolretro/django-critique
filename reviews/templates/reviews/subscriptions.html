@@ -1,47 +1,45 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 {% load static %}
 
 {% block content %}
-<h2>Mes abonnements</h2>
+<h2>👥 Mes abonnements</h2>
 
-<!-- MESSAGES -->
-{% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
-
-<!-- FORMULAIRE -->
 <form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Suivre</button>
+    {% csrf_token %}
+    <label for="username">Nom d'utilisateur à suivre:</label>
+    <input type="text" name="username" id="username" required>
+    <button type="submit">Suivre</button>
 </form>
 
-<hr>
-
-<h3>Je suis :</h3>
 <ul>
-  {% for follow in following %}
+{% for followed_user in following %}
     <li>
-      {{ follow.followed_user.username }}
-      <form method="post" action="{% url 'unsubscribe' follow.id %}" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit">Se désabonner</button>
-      </form>
+        {{ followed_user.username }}
+        <form method="post" action="{% url 'unsubscribe' followed_user.id %}">
+            {% csrf_token %}
+            <button type="submit">Se désabonner</button>
+        </form>
+
+        {% if followers_of_followed|get_item:followed_user %}
+            <p><strong>📣 {{ followed_user.username }} est suivi par :</strong></p>
+            <ul>
+                {% for follower in followers_of_followed|get_item:followed_user %}
+                    <li>{{ follower.user.username }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     </li>
-  {% empty %}
-    <li>Vous ne suivez personne.</li>
-  {% endfor %}
-</ul>
-  {% for follow in followers %}
-    <li>{{ follow.user.username }}</li>
-  {% empty %}
-    <li>Personne ne vous suit pour le moment.</li>
-  {% endfor %}
+{% empty %}
+    <li>Vous ne suivez encore personne.</li>
+{% endfor %}
 </ul>
 
-<a href="{% url 'home' %}">Retour à l'accueil</a>
+<!-- FORMULAIRE (assumé que c’est un autre formulaire, par exemple un formulaire Django) -->
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Envoyer</button>
+</form>
+
 {% endblock %}
