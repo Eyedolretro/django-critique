@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>📚 Mon espace</h2>
+
+<h3>Mes tickets</h3>
+{% for ticket in tickets %}
+    <p><strong>{{ ticket.title }}</strong> - {{ ticket.description }}</p>
+{% empty %}
+    <p>Vous n'avez créé aucun ticket.</p>
+{% endfor %}
+
+<h3>Mes critiques</h3>
+{% for review in reviews %}
+    <p><strong>Note : {{ review.rating }}/5</strong> - {{ review.headline }}</p>
+{% empty %}
+    <p>Vous n'avez écrit aucune critique.</p>
+{% endfor %}
+{% endblock %}

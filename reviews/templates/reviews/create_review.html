@@ -1,17 +1,6 @@
-{% load custom_filters %}
-
-<h2>Critiquer ce ticket</h2>
-
-<div>
-    <h3>{{ ticket.title }}</h3>
-    <p>{{ ticket.description }}</p>
-    {% if ticket.image %}
-        <img src="{{ ticket.image.url }}" alt="Image du ticket" width="200">
-    {% endif %}
-</div>
-
+<h2>Ajouter une critique pour "{{ ticket.title }}"</h2>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Publier la critique</button>
+    <button type="submit">Envoyer</button>
 </form>

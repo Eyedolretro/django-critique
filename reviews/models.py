@@ -1,60 +1,36 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
 
 class Ticket(models.Model):
-    title = models.CharField(max_length=128)
-    description = models.TextField(blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tickets')
+    title = models.CharField(max_length=255)
+    description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    
+
     def __str__(self):
         return self.title
 
-
 class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    rating = models.PositiveSmallIntegerField()
     content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)  # homogène avec Ticket
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.rating}/5"
+        return f"Review by {self.user.username} on {self.ticket.title}"
 
-    @property
-    def classname(self):
-        return self.__class__.__name__
+class Response(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='responses')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class UserFollows(models.Model):
-    user = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
-    followed_user = models.ForeignKey(User, related_name='followed_by', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follows')
+    followed_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers')
 
     class Meta:
         unique_together = ('user', 'followed_user')
 
     def __str__(self):
-        return f"{self.user.username} suit {self.followed_user.username}"
-
-class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-class Response(models.Model):
-    review = models.ForeignKey(Review, related_name="responses", on_delete=models.CASCADE)
-    responder = models.ForeignKey(User, on_delete=models.CASCADE)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['created_at']
-
-class Article(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Article de {self.author.username} ({self.created_at})"
+        return f"{self.user.username} follows {self.followed_user.username}"

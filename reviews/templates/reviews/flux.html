@@ -1,7 +1,28 @@
-<!-- reviews/templates/reviews/flux.html -->
-
 {% extends 'base.html' %}
-{% load custom_filters %}
 {% block content %}
-  ...
+<h2>Flux des tickets et critiques</h2>
+
+<a href="{% url 'create_ticket' %}">Créer un nouveau ticket</a>
+
+{% for ticket in tickets %}
+    <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+        <h3>{{ ticket.title }} - par {{ ticket.user.username }}</h3>
+        <p>{{ ticket.description }}</p>
+
+        <h4>Critiques :</h4>
+        {% if ticket.prefetched_reviews %}
+            {% for review in ticket.prefetched_reviews %}
+                <div style="margin-left:20px;">
+                    <strong>{{ review.user.username }} :</strong> {{ review.content }}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Aucune critique pour ce ticket.</p>
+        {% endif %}
+
+        <p><a href="{% url 'create_review' ticket.id %}">Ajouter une critique</a></p>
+    </div>
+{% empty %}
+    <p>Aucun ticket à afficher.</p>
+{% endfor %}
 {% endblock %}

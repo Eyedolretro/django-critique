@@ -1,96 +1,28 @@
-<!-- reviews/templates/base.html -->
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-    <style>
-        .login-container {
-          max-width: 400px;
-          margin: 2rem auto;
-          padding: 2rem;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          background-color: #f9f9f9;
-        }
-      
-        .login-container form > div {
-          margin-bottom: 1rem;
-        }
-      
-        .login-container button {
-          padding: 0.5rem 1rem;
-          background-color: #007bff;
-          border: none;
-          color: white;
-          border-radius: 4px;
-          cursor: pointer;
-        }
-      
-        .login-container a {
-          color: #007bff;
-        }
-      </style>
-      <style>
-        .signup-container {
-          max-width: 400px;
-          margin: 2rem auto;
-          padding: 2rem;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          background-color: #f9f9f9;
-        }
-      
-        .signup-container form > div {
-          margin-bottom: 1rem;
-        }
-      
-        .signup-container button {
-          padding: 0.5rem 1rem;
-          background-color: #28a745;
-          border: none;
-          color: white;
-          border-radius: 4px;
-          cursor: pointer;
-        }
-      
-        .signup-container a {
-          color: #28a745;
-        }
-      </style>
-      
-      
-    <meta charset="UTF-8">
-    <title>{% block title %}CritiqueHub{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+    <title>CritiqueHub</title>
 </head>
 <body>
-    <header>
-        <h1><a href="/">CritiqueHub</a></h1>
+<header>
+    <h1>🎬 CritiqueHub</h1>
+    {% if user.is_authenticated %}
+        <p>Bonjour {{ user.username }} | <a href="{% url 'logout' %}">Déconnexion</a></p>
         <nav>
-            <a href="/">Accueil</a>
-            <a href="/admin/">Admin</a>
+            <a href="{% url 'flux' %}">Flux</a> |
+            <a href="{% url 'subscriptions' %}">Abonnements</a> |
+            <a href="{% url 'my_posts' %}">Mon espace</a>
         </nav>
-    </header>
+    {% else %}
+        <a href="{% url 'login' %}">Se connecter</a> |
+        <a href="{% url 'signup' %}">S'inscrire</a>
+    {% endif %}
+</header>
 
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
-
-    <footer>
-        <p>&copy; 2025 - CritiqueHub</p>
-    </footer>
-    <a href="{% url 'subscriptions' %}">Mes abonnements</a>{% if ticket %}
-    <a href="{% url 'create_review' ticket.id %}">Critiquer</a>
-{% endif %}
-
-
-
-    <a href="{% url 'followed_users_feed' %}">Flux suivi</a>
-
-    <a href="{% url 'mes_contributions' %}">📚 Mon espace</a>
-
-
-    
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
 
 </body>
 </html>
